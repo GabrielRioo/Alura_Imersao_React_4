@@ -75,8 +75,7 @@ export default function PaginaInicial() {
             onSubmit={function(event) {
               event.preventDefault();
               // window.location.href = '/chat'
-              roteamento.push('/chat')
-            }}
+              roteamento.push(`/chat?username=${username}`)}}
             styleSheet={{
               display: "flex",
               flexDirection: "column",

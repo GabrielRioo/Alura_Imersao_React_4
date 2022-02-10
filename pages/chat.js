@@ -2,6 +2,8 @@ import { Box, Text, TextField, Image, Button } from "@skynexui/components";
 import React from "react";
 import appConfig from "../config.json";
 import { createClient } from "@supabase/supabase-js";
+import { useRouter } from 'next/router';
+import { ButtonSendSticker } from '../src/components/ButtonSendStickers'
 
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzU3NDk4NywiZXhwIjoxOTU5MTUwOTg3fQ.2-f1Vt9rvA1Dm5oS2uKYSiSQzpffctBxNSnpCq8mzY4";
@@ -9,8 +11,16 @@ const SUPABASE_URL = "https://mlrpudqmhstoqwjtpmyl.supabase.co";
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export default function ChatPage() {
-  const [mensagem, setMensagem] = React.useState("");
-  const [listaDeMensagens, setListaDeMensagens] = React.useState([]);
+  const roteamento = useRouter();
+  const usuarioLogado = roteamento.query.username;
+  const [mensagem, setMensagem] = React.useState('');
+  const [listaDeMensagens, setListaDeMensagens] = React.useState([
+    {
+      id: 1,
+      de: 'GabrielRioo',
+      texto: ':sticker: https://c.tenor.com/TKpmh4WFEsAAAAAC/alura-gaveta-filmes.gif',
+    }
+  ]);
 
   React.useEffect(() => {
     supabaseClient
@@ -19,7 +29,7 @@ export default function ChatPage() {
       .order('id', { ascending: false}) // ordernar na ordem de baixo p cima
       .then(({ data }) => {
         console.log("Dados:", data);
-        setListaDeMensagens(data);
+        // setListaDeMensagens(data);
       });
   }, []);
 
@@ -36,7 +46,7 @@ export default function ChatPage() {
     */
   function handleNovaMensagem(novaMensagem) {
     const mensagem = {
-      de: "vanessametonini",
+      de: usuarioLogado,
       texto: novaMensagem,
     };
 
@@ -132,6 +142,7 @@ export default function ChatPage() {
                 color: appConfig.theme.colors.neutrals[200],
               }}
             />
+            <ButtonSendSticker />
           </Box>
         </Box>
       </Box>
@@ -218,7 +229,9 @@ function MessageList(props) {
                 {new Date().toLocaleDateString()}
               </Text>
             </Box>
-            {mensagem.texto}
+            {mensagem.texto.startsWith(':sticker:')
+              ? (<Image src={mensagem.texto.replace(':sticker:', '')}/>)
+              : (mensagem.texto)}
           </Text>
         );
       })}
